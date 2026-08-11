@@ -1,0 +1,27 @@
+# Dependencies (NEVER commit these)
+node_modules/
+.pnpm-store/
+
+# Noir / ZK Build Artifacts
+circuits/target/
+Prover.toml
+Verifier.toml
+
+# Hardhat & Smart Contract Artifacts
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+
+# Vite Frontend Build
+web/dist/
+web/.vite/
+
+# Environment Variables & Secrets (CRITICAL)
+.env
+.env.local
+*.pem
+
+# IDE & OS Files
+.DS_Store
+.vscode/
+.idea/
