@@ -6,23 +6,31 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "oxlint",
+    "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@aztec/bb.js": "^5.1.0",
-    "@noir-lang/noir_js": "^1.0.0-beta.26",
-    "ethers": "^6.17.0",
+    "@noir-lang/acvm_js": "^1.0.0-beta.26",
+    "@noir-lang/backend_barretenberg": "^0.36.0",
+    "@noir-lang/noirc_abi": "^1.0.0-beta.26",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
-    "oxlint": "^1.75.0",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "rollup": "^4.62.5",
     "typescript": "~6.0.2",
-    "vite": "^8.2.0"
+    "typescript-eslint": "^8.65.0",
+    "vite": "^8.2.0",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.6.0"
   }
 }
