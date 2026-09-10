@@ -1,21 +1,7 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import wasm from 'vite-plugin-wasm';
-import topLevelAwait from 'vite-plugin-top-level-await';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    // @ts-ignore
-    wasm(),
-    // @ts-ignore
-    topLevelAwait()
-  ],
-  optimizeDeps: {
-    exclude: [
-      '@noir-lang/noir_js',
-      '@noir-lang/backend_barretenberg',
-      '@noir-lang/acvm_js'
-    ]
-  }
-});
+  plugins: [react()],
+})
