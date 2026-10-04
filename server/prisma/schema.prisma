@@ -1,0 +1,57 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./aarogyan.db"
+}
+
+// Users represent all three roles — wallet address is the primary identifier
+model User {
+  id            Int      @id @default(autoincrement())
+  walletAddress String   @unique
+  role          String   // "PATIENT" | "HOSPITAL" | "RESEARCHER"
+  name          String
+  orgName       String?  // Hospital/Research org name (null for patients)
+  publicKey     String?  // Secp256k1 pub key for ECIES encryption (hospitals only)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  issuedCredentials Credential[] @relation("IssuerCredentials")
+  receivedCredentials Credential[] @relation("PatientCredentials")
+  trials        Trial[]
+}
+
+// Signed credential issued by a hospital to a patient
+model Credential {
+  id              Int      @id @default(autoincrement())
+  issuerId        Int
+  patientId       Int
+  issuer          User     @relation("IssuerCredentials", fields: [issuerId], references: [id])
+  patient         User     @relation("PatientCredentials", fields: [patientId], references: [id])
+  // Encrypted payload — health data is NOT stored raw; only the signed bundle hash
+  credentialHash  String   // keccak256 of the signed JSON bundle
+  issuerSignature String   // Hospital ECDSA signature over credentialHash
+  issuedAt        DateTime @default(now())
+  expiresAt       DateTime?
+  status          String   @default("ACTIVE") // "ACTIVE" | "REVOKED"
+}
+
+// Clinical trial events created by researchers
+model Trial {
+  id              Int      @id @default(autoincrement())
+  eventId         Int      @unique
+  title           String
+  description     String?
+  researcherId    Int
+  researcher      User     @relation(fields: [researcherId], references: [id])
+  // Criteria stored as JSON string (minAge, maxAge, maxHba1c, etc.)
+  criteriaJson    String
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+}

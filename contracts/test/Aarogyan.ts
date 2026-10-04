@@ -1,57 +1,94 @@
 import { expect } from "chai";
 import { network } from "hardhat";
 
-describe("Aarogyan", function () {
-
-    it("should accept a valid proof and store the nullifier", async function () {
-
+describe("Aarogyan Smart Contract", function () {
+    async function deployFixture() {
         const { ethers } = await network.connect();
+        const verifier = await ethers.deployContract("UltraVerifier");
+        const aarogyan = await ethers.deployContract("Aarogyan", [
+            await verifier.getAddress()
+        ]);
+        const [owner, otherAccount] = await ethers.getSigners();
+        return { ethers, verifier, aarogyan, owner, otherAccount };
+    }
 
-        // Deploy MockVerifier
-        const MockVerifier =
-            await ethers.deployContract("MockVerifier", [true]);
+    it("should accept a valid full proof and emit MatchRegistered event", async function () {
+        const { aarogyan, owner } = await deployFixture();
 
-        // Deploy Aarogyan
-        const aarogyan =
-            await ethers.deployContract("Aarogyan", [
-                await MockVerifier.getAddress()
-            ]);
+        const nullifier = "0x" + "11".repeat(32);
+        // Minimum 256 bytes for mock valid proof
+        const proof = "0x" + "aa".repeat(256);
+        
+        // 4 Public inputs: Event ID, Nullifier, Min Age, Max Age
+        const eventIdRaw = "0x" + "00".repeat(31) + "65"; // 101 in hex
+        const publicInputs = [
+            eventIdRaw,
+            nullifier,
+            "0x" + "00".repeat(31) + "12",
+            "0x" + "00".repeat(31) + "41"
+        ];
+        const eventId = 101n;
 
-        // Create a test nullifier
-        const nullifier = ethers.id("patient-123");
+        const tx = await aarogyan.submitProof(nullifier, proof, publicInputs, eventId);
+        await expect(tx)
+            .to.emit(aarogyan, "MatchRegistered")
+            .withArgs(owner.address, nullifier, eventId, (timestamp: any) => timestamp > 0);
 
-        // Submit the proof
-        await aarogyan.submitProof(nullifier);
-
-        // Check that the nullifier was stored
-        expect(
-            await aarogyan.usedNullifiers(nullifier)
-        ).to.equal(true);
+        expect(await aarogyan.usedNullifiers(nullifier)).to.equal(true);
     });
 
-    it("should reject a duplicate nullifier", async function () {
+    it("should reject duplicate nullifier with full proof (replay attack prevention)", async function () {
+        const { aarogyan } = await deployFixture();
 
-    const { ethers } = await network.connect();
+        const nullifier = "0x" + "33".repeat(32);
+        const proof = "0x" + "aa".repeat(256);
+        const eventIdRaw = "0x" + "00".repeat(31) + "65";
+        const publicInputs = [
+            eventIdRaw,
+            nullifier,
+            "0x" + "00".repeat(31) + "12",
+            "0x" + "00".repeat(31) + "41"
+        ];
+        const eventId = 101n;
 
-    const MockVerifier =
-        await ethers.deployContract("MockVerifier", [true]);
+        await aarogyan.submitProof(nullifier, proof, publicInputs, eventId);
 
-    const aarogyan =
-        await ethers.deployContract("Aarogyan", [
-            await MockVerifier.getAddress()
-        ]);
+        await expect(
+            aarogyan.submitProof(nullifier, proof, publicInputs, eventId)
+        ).to.be.revertedWith("Nullifier already used");
+    });
 
-    const nullifier = ethers.id("patient-123");
+    it("should reject invalid proof structure (too short) from verifier", async function () {
+        const { aarogyan } = await deployFixture();
 
-    // First submission should succeed
-    await aarogyan.submitProof(nullifier);
+        const nullifier = "0x" + "55".repeat(32);
+        const proof = "0xbaad"; // Too short
+        const eventIdRaw = "0x" + "00".repeat(31) + "65";
+        const publicInputs = [
+            eventIdRaw,
+            nullifier,
+            "0x" + "00".repeat(31) + "12",
+            "0x" + "00".repeat(31) + "41"
+        ];
+        const eventId = 101n;
 
-    // Second submission should fail
-    await expect(
-        aarogyan.submitProof(nullifier)
-    ).to.be.revertedWith("Nullifier already used");
-});
-
+        await expect(
+            aarogyan.submitProof(nullifier, proof, publicInputs, eventId)
+        ).to.be.revertedWith("UltraVerifier: INVALID_PROOF_LENGTH");
+    });
     
+    it("should reject invalid public inputs structure (wrong length)", async function () {
+        const { aarogyan } = await deployFixture();
 
+        const nullifier = "0x" + "55".repeat(32);
+        const proof = "0x" + "aa".repeat(256);
+        const publicInputs = [
+            "0x" + "00".repeat(31) + "65"
+        ]; // Too short
+        const eventId = 101n;
+
+        await expect(
+            aarogyan.submitProof(nullifier, proof, publicInputs, eventId)
+        ).to.be.revertedWith("Invalid public inputs");
+    });
 });

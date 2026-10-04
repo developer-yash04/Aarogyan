@@ -5,7 +5,6 @@ mod exclusions;
 mod nullifier;
 
 use types::{Demographics, DemographicCriteria, ClinicalMeasurements, MeasurementCriteria, Exclusions};
-use std::hash::pedersen_hash;
 
 fn main(
     // Private Inputs (Patient records)
@@ -19,13 +18,12 @@ fn main(
     measurement_criteria: pub MeasurementCriteria,
     exclude_pregnancy: pub bool,
     exclude_cancer: pub bool,
-    event_id: pub Field,
-    expected_nullifier: pub Field
-) {
+    event_id: pub Field
+) -> pub Field {
     demographics::verify_demographics(demographics_data, demographic_criteria);
     measurements::verify_measurements(measurements_data, measurement_criteria);
     exclusions::verify_exclusions(exclusions_data, exclude_pregnancy, exclude_cancer);
-    nullifier::verify_nullifier(user_secret, event_id, expected_nullifier);
+    nullifier::compute_nullifier(user_secret, event_id)
 }
 
 #[test]
@@ -40,9 +38,9 @@ fn test_valid_patient_eligibility() {
     
     let secret: Field = 12345;
     let event: Field = 1;
-    let expected_null = pedersen_hash([secret, event]);
 
-    main(demo, meas, excl, secret, demo_crit, meas_crit, true, true, event, expected_null);
+    let null = main(demo, meas, excl, secret, demo_crit, meas_crit, true, true, event);
+    assert(null != 0);
 }
 
 #[test(should_fail_with = "Age below minimum requirement")]
@@ -57,7 +55,6 @@ fn test_underage_patient_fails() {
     
     let secret: Field = 12345;
     let event: Field = 1;
-    let expected_null = pedersen_hash([secret, event]);
 
-    main(demo, meas, excl, secret, demo_crit, meas_crit, true, true, event, expected_null);
+    let _null = main(demo, meas, excl, secret, demo_crit, meas_crit, true, true, event);
 }

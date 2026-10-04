@@ -12,4 +12,12 @@ contract MockVerifier {
     function verifyProof() public view returns (bool) {
         return shouldVerify;
     }
+
+    function verify(bytes calldata /* proof */, bytes32[] calldata /* publicInputs */) external view returns (bool) {
+        return shouldVerify;
+    }
+
+    function setShouldVerify(bool _val) external {
+        shouldVerify = _val;
+    }
 }

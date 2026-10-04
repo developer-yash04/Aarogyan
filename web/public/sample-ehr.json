@@ -1,0 +1,215 @@
+{
+  "resourceType": "Bundle",
+  "id": "aarogyan-demo-patient-bundle",
+  "meta": {
+    "profile": ["http://hl7.org/fhir/us/core/StructureDefinition/us-core-bundle"]
+  },
+  "type": "collection",
+  "timestamp": "2026-09-15T09:30:00+05:30",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "patient-aarav-sharma-001",
+        "meta": {
+          "profile": ["http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"]
+        },
+        "name": [{ "use": "official", "text": "Aarav Sharma", "family": "Sharma", "given": ["Aarav"] }],
+        "gender": "male",
+        "birthDate": "1998-04-12",
+        "address": [{ "country": "IN", "state": "Maharashtra", "city": "Mumbai" }]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-hba1c-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "4548-4",
+              "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+            }
+          ],
+          "text": "HbA1c"
+        },
+        "subject": { "reference": "Patient/patient-aarav-sharma-001" },
+        "effectiveDateTime": "2026-09-15T08:00:00+05:30",
+        "performer": [{ "reference": "Organization/apollo-research-institute" }],
+        "valueQuantity": {
+          "value": 5.6,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "referenceRange": [
+          { "low": { "value": 4.0, "unit": "%"}, "high": { "value": 6.4, "unit": "%"}, "text": "Normal" }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-bmi-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "39156-5",
+              "display": "Body mass index (BMI) [Ratio]"
+            }
+          ],
+          "text": "BMI"
+        },
+        "subject": { "reference": "Patient/patient-aarav-sharma-001" },
+        "effectiveDateTime": "2026-09-15T08:15:00+05:30",
+        "valueQuantity": {
+          "value": 22.4,
+          "unit": "kg/m2",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg/m2"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-bp-001",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "85354-9",
+              "display": "Blood pressure panel with all children optional"
+            }
+          ],
+          "text": "Blood Pressure"
+        },
+        "subject": { "reference": "Patient/patient-aarav-sharma-001" },
+        "effectiveDateTime": "2026-09-15T08:10:00+05:30",
+        "component": [
+          {
+            "code": {
+              "coding": [
+                { "system": "http://loinc.org", "code": "8480-6", "display": "Systolic blood pressure" }
+              ]
+            },
+            "valueQuantity": {
+              "value": 118,
+              "unit": "mmHg",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                { "system": "http://loinc.org", "code": "8462-4", "display": "Diastolic blood pressure" }
+              ]
+            },
+            "valueQuantity": {
+              "value": 78,
+              "unit": "mmHg",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "condition-no-pregnancy",
+        "clinicalStatus": {
+          "coding": [
+            { "system": "http://terminology.hl7.org/CodeSystem/condition-clinical", "code": "inactive" }
+          ]
+        },
+        "code": {
+          "coding": [{ "system": "http://snomed.info/sct", "code": "72892002", "display": "Normal pregnancy" }],
+          "text": "No active pregnancy"
+        },
+        "subject": { "reference": "Patient/patient-aarav-sharma-001" },
+        "onsetDateTime": null
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Condition",
+        "id": "condition-no-cancer",
+        "clinicalStatus": {
+          "coding": [
+            { "system": "http://terminology.hl7.org/CodeSystem/condition-clinical", "code": "inactive" }
+          ]
+        },
+        "code": {
+          "coding": [
+            { "system": "http://snomed.info/sct", "code": "363346000", "display": "Malignant neoplastic disease" }
+          ],
+          "text": "No cancer history"
+        },
+        "subject": { "reference": "Patient/patient-aarav-sharma-001" },
+        "onsetDateTime": null
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Organization",
+        "id": "apollo-research-institute",
+        "name": "Apollo Research Institute",
+        "identifier": [
+          { "system": "http://hl7.org/fhir/sid/us-npi", "value": "1234567890" }
+        ],
+        "address": [{ "country": "IN", "city": "Mumbai" }]
+      }
+    }
+  ],
+  "_aarogyanAttestation": {
+    "issuerName": "Apollo Research Institute",
+    "issuerAddress": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "patientRegionId": "101",
+    "patientCitizenshipCode": 356,
+    "patientSex": 1,
+    "userSecretHint": "Use your Aarogyan patient secret key when generating the ZK proof",
+    "issuedAt": "2026-09-15T09:30:00+05:30",
+    "signature": "0x4d58b12c0a3f7e896541bcd2a7f99e3b152cfe901a4d7820b6fc3a8e2c5091a34b76cde812f4953a8c0e172baf8d9471c3d0f5e2b1a98c7d6f4e0b2c358a16f1b"
+  }
+}
